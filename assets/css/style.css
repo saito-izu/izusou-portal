@@ -192,6 +192,13 @@ table tbody tr:hover {
     background: var(--light-color);
 }
 
+table td .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    margin-right: 0.5rem;
+    display: inline-block;
+}
+
 /* フォーム */
 .form-container {
     background: white;

@@ -5,6 +5,13 @@ require_once __DIR__ . '/../../includes/db.php';
 $pageTitle = '水抜き箇所 - 水道事業';
 $db = Database::getInstance();
 
+// 編集対象のデータを取得
+$edit_location = null;
+if (isset($_GET['edit'])) {
+    $edit_location = $db->fetchOne("SELECT * FROM water_drainage_locations WHERE id = ?", [(int)$_GET['edit']]);
+}
+
+// データの追加処理
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add') {
     $data = [
         'location_name' => $_POST['location_name'],
@@ -23,9 +30,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
+// データの更新処理
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'update') {
+    $id = (int)$_POST['id'];
+    $data = [
+        'location_name' => $_POST['location_name'],
+        'address' => $_POST['address'],
+        'property_owner' => $_POST['property_owner'],
+        'contact_info' => $_POST['contact_info'],
+        'drainage_type' => $_POST['drainage_type'],
+        'last_drainage_date' => $_POST['last_drainage_date'],
+        'next_scheduled_date' => $_POST['next_scheduled_date'],
+        'status' => $_POST['status'],
+        'notes' => $_POST['notes']
+    ];
+    
+    if ($db->update('water_drainage_locations', $data, 'id = :id', ['id' => $id])) {
+        $success_message = '水抜き箇所を更新しました。';
+        header('Location: water_drainage.php?updated=1');
+        exit;
+    } else {
+        $error_message = '更新に失敗しました。';
+    }
+}
+
+// データの削除処理
 if (isset($_GET['delete'])) {
     $db->delete('water_drainage_locations', 'id = :id', ['id' => (int)$_GET['delete']]);
     $success_message = '水抜き箇所を削除しました。';
+}
+
+if (isset($_GET['updated'])) {
+    $success_message = '水抜き箇所を更新しました。';
 }
 
 $locations = $db->fetchAll("SELECT * FROM water_drainage_locations ORDER BY next_scheduled_date ASC");
@@ -42,65 +78,81 @@ include __DIR__ . '/../../includes/header.php';
     <div class="alert alert-success"><?php echo htmlspecialchars($success_message); ?></div>
 <?php endif; ?>
 
+<?php if (isset($error_message)): ?>
+    <div class="alert alert-error"><?php echo htmlspecialchars($error_message); ?></div>
+<?php endif; ?>
+
 <div class="form-container">
-    <h2>新規水抜き箇所登録</h2>
+    <h2><?php echo $edit_location ? '水抜き箇所編集' : '新規水抜き箇所登録'; ?></h2>
     <form method="POST">
-        <input type="hidden" name="action" value="add">
+        <input type="hidden" name="action" value="<?php echo $edit_location ? 'update' : 'add'; ?>">
+        <?php if ($edit_location): ?>
+            <input type="hidden" name="id" value="<?php echo $edit_location['id']; ?>">
+        <?php endif; ?>
         
         <div class="form-group">
             <label for="location_name">場所名 *</label>
-            <input type="text" id="location_name" name="location_name" required>
+            <input type="text" id="location_name" name="location_name" required
+                   value="<?php echo htmlspecialchars($edit_location['location_name'] ?? ''); ?>">
         </div>
         
         <div class="form-group">
             <label for="address">住所 *</label>
-            <input type="text" id="address" name="address" required>
+            <input type="text" id="address" name="address" required
+                   value="<?php echo htmlspecialchars($edit_location['address'] ?? ''); ?>">
         </div>
         
         <div class="form-group">
             <label for="property_owner">物件所有者</label>
-            <input type="text" id="property_owner" name="property_owner">
+            <input type="text" id="property_owner" name="property_owner"
+                   value="<?php echo htmlspecialchars($edit_location['property_owner'] ?? ''); ?>">
         </div>
         
         <div class="form-group">
             <label for="contact_info">連絡先</label>
-            <input type="text" id="contact_info" name="contact_info">
+            <input type="text" id="contact_info" name="contact_info"
+                   value="<?php echo htmlspecialchars($edit_location['contact_info'] ?? ''); ?>">
         </div>
         
         <div class="form-group">
             <label for="drainage_type">水抜き種別</label>
             <select id="drainage_type" name="drainage_type">
-                <option value="ドレン">ドレン</option>
-                <option value="水栓">水栓</option>
-                <option value="取出し">取出し</option>
+                <option value="ドレン" <?php echo ($edit_location['drainage_type'] ?? '') === 'ドレン' ? 'selected' : ''; ?>>ドレン</option>
+                <option value="水栓" <?php echo ($edit_location['drainage_type'] ?? '') === '水栓' ? 'selected' : ''; ?>>水栓</option>
+                <option value="取出し" <?php echo ($edit_location['drainage_type'] ?? '') === '取出し' ? 'selected' : ''; ?>>取出し</option>
             </select>
         </div>
         
         <div class="form-group">
             <label for="last_drainage_date">前回水抜き日</label>
-            <input type="date" id="last_drainage_date" name="last_drainage_date">
+            <input type="date" id="last_drainage_date" name="last_drainage_date"
+                   value="<?php echo htmlspecialchars($edit_location['last_drainage_date'] ?? ''); ?>">
         </div>
         
         <div class="form-group">
             <label for="next_scheduled_date">次回予定日</label>
-            <input type="date" id="next_scheduled_date" name="next_scheduled_date">
+            <input type="date" id="next_scheduled_date" name="next_scheduled_date"
+                   value="<?php echo htmlspecialchars($edit_location['next_scheduled_date'] ?? ''); ?>">
         </div>
         
         <div class="form-group">
             <label for="status">状態 *</label>
             <select id="status" name="status" required>
-                <option value="pending">未実施</option>
-                <option value="scheduled">予定あり</option>
-                <option value="completed">完了</option>
+                <option value="pending" <?php echo ($edit_location['status'] ?? '') === 'pending' ? 'selected' : ''; ?>>未実施</option>
+                <option value="scheduled" <?php echo ($edit_location['status'] ?? '') === 'scheduled' ? 'selected' : ''; ?>>予定あり</option>
+                <option value="completed" <?php echo ($edit_location['status'] ?? '') === 'completed' ? 'selected' : ''; ?>>完了</option>
             </select>
         </div>
         
         <div class="form-group">
             <label for="notes">備考</label>
-            <textarea id="notes" name="notes"></textarea>
+            <textarea id="notes" name="notes"><?php echo htmlspecialchars($edit_location['notes'] ?? ''); ?></textarea>
         </div>
         
-        <button type="submit" class="btn">登録する</button>
+        <button type="submit" class="btn"><?php echo $edit_location ? '更新する' : '登録する'; ?></button>
+        <?php if ($edit_location): ?>
+            <a href="water_drainage.php" class="btn btn-secondary">キャンセル</a>
+        <?php endif; ?>
     </form>
 </div>
 
@@ -140,6 +192,7 @@ include __DIR__ . '/../../includes/header.php';
                             </span>
                         </td>
                         <td>
+                            <a href="?edit=<?php echo $location['id']; ?>" class="btn">編集</a>
                             <a href="?delete=<?php echo $location['id']; ?>" 
                                class="btn btn-warning" 
                                onclick="return confirm('本当に削除しますか？')">削除</a>
