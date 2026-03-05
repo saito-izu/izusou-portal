@@ -70,9 +70,9 @@ include __DIR__ . '/../../includes/header.php';
         <div class="form-group">
             <label for="drainage_type">水抜き種別</label>
             <select id="drainage_type" name="drainage_type">
-                <option value="定期水抜き">定期水抜き</option>
-                <option value="季節水抜き">季節水抜き（冬季）</option>
-                <option value="緊急水抜き">緊急水抜き</option>
+                <option value="ドレン">ドレン</option>
+                <option value="水栓">水栓</option>
+                <option value="取出し">取出し</option>
             </select>
         </div>
         
