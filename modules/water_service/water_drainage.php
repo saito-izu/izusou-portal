@@ -136,11 +136,13 @@ include __DIR__ . '/../../includes/header.php';
         </div>
         
         <div class="form-group">
-            <label for="status">状態 *</label>
+            <label for="status">状況 *</label>
             <select id="status" name="status" required>
-                <option value="pending" <?php echo ($edit_location['status'] ?? '') === 'pending' ? 'selected' : ''; ?>>未実施</option>
-                <option value="scheduled" <?php echo ($edit_location['status'] ?? '') === 'scheduled' ? 'selected' : ''; ?>>予定あり</option>
-                <option value="completed" <?php echo ($edit_location['status'] ?? '') === 'completed' ? 'selected' : ''; ?>>完了</option>
+                <option value="濁り" <?php echo ($edit_location['status'] ?? '') === '濁り' ? 'selected' : ''; ?>>濁り</option>
+                <option value="砂" <?php echo ($edit_location['status'] ?? '') === '砂' ? 'selected' : ''; ?>>砂</option>
+                <option value="赤水" <?php echo ($edit_location['status'] ?? '') === '赤水' ? 'selected' : ''; ?>>赤水</option>
+                <option value="塩素うすい" <?php echo ($edit_location['status'] ?? '') === '塩素うすい' ? 'selected' : ''; ?>>塩素うすい</option>
+                <option value="温かい" <?php echo ($edit_location['status'] ?? '') === '温かい' ? 'selected' : ''; ?>>温かい</option>
             </select>
         </div>
         
@@ -168,7 +170,7 @@ include __DIR__ . '/../../includes/header.php';
                     <th>種別</th>
                     <th>前回実施日</th>
                     <th>次回予定日</th>
-                    <th>状態</th>
+                    <th>状況</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -182,13 +184,8 @@ include __DIR__ . '/../../includes/header.php';
                         <td><?php echo $location['last_drainage_date'] ?? '-'; ?></td>
                         <td><?php echo $location['next_scheduled_date'] ?? '-'; ?></td>
                         <td>
-                            <?php
-                            $statusMap = ['pending' => '未実施', 'scheduled' => '予定あり', 'completed' => '完了'];
-                            $statusClass = $location['status'] === 'completed' ? 'badge-success' : 
-                                          ($location['status'] === 'scheduled' ? 'badge-info' : 'badge-warning');
-                            ?>
-                            <span class="badge <?php echo $statusClass; ?>">
-                                <?php echo $statusMap[$location['status']] ?? $location['status']; ?>
+                            <span class="badge badge-info">
+                                <?php echo htmlspecialchars($location['status']); ?>
                             </span>
                         </td>
                         <td>
