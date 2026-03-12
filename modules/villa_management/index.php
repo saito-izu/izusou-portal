@@ -92,7 +92,7 @@ include __DIR__ . '/../../includes/header.php';
         </div>
         
         <div class="form-group">
-            <label for="management_status">管理状態 *</label>
+            <label for="management_status">管理状況 *</label>
             <select id="management_status" name="management_status" required>
                 <option value="active">管理中</option>
                 <option value="paused">一時停止</option>
@@ -129,7 +129,7 @@ include __DIR__ . '/../../includes/header.php';
                     <th>所在地</th>
                     <th>オーナー</th>
                     <th>連絡先</th>
-                    <th>管理状態</th>
+                    <th>管理状況</th>
                     <th>前回点検</th>
                     <th>次回点検</th>
                     <th>操作</th>

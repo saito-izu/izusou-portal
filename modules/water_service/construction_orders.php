@@ -97,7 +97,7 @@ include __DIR__ . '/../../includes/header.php';
         </div>
         
         <div class="form-group">
-            <label for="status">状態 *</label>
+            <label for="status">状況 *</label>
             <select id="status" name="status" required>
                 <option value="受付">受付</option>
                 <option value="見積中">見積中</option>
@@ -132,7 +132,7 @@ include __DIR__ . '/../../includes/header.php';
                     <th>住所</th>
                     <th>工事種別</th>
                     <th>工事予定日</th>
-                    <th>状態</th>
+                    <th>状況</th>
                     <th>担当者</th>
                     <th>操作</th>
                 </tr>
