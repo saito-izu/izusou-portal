@@ -83,7 +83,7 @@ include __DIR__ . '/../../includes/header.php';
         </div>
         
         <div class="form-group">
-            <label for="status">状態 *</label>
+            <label for="status">状況 *</label>
             <select id="status" name="status" required>
                 <option value="販売中">販売中</option>
                 <option value="契約済">契約済</option>
@@ -125,7 +125,7 @@ include __DIR__ . '/../../includes/header.php';
                     <th>物件名</th>
                     <th>所在地</th>
                     <th>種別</th>
-                    <th>状態</th>
+                    <th>状況</th>
                     <th>価格（円）</th>
                     <th>面積（㎡）</th>
                     <th>担当者</th>

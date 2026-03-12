@@ -88,7 +88,7 @@ include __DIR__ . '/../../includes/header.php';
         </div>
         
         <div class="form-group">
-            <label for="progress_status">進捗状態 *</label>
+            <label for="progress_status">進捗状況 *</label>
             <select id="progress_status" name="progress_status" required>
                 <option value="未着手">未着手</option>
                 <option value="準備中">準備中</option>
@@ -118,7 +118,7 @@ include __DIR__ . '/../../includes/header.php';
                     <th>予定日</th>
                     <th>担当者</th>
                     <th>優先度</th>
-                    <th>進捗状態</th>
+                    <th>進捗状況</th>
                     <th>操作</th>
                 </tr>
             </thead>
