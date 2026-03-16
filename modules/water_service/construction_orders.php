@@ -12,14 +12,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     
     $data = [
         'order_number' => $order_number,
-        'customer_name' => $_POST['customer_name'],
-        'address' => $_POST['address'],
-        'phone' => $_POST['phone'],
-        'construction_type' => $_POST['construction_type'],
-        'scheduled_date' => $_POST['scheduled_date'],
-        'status' => $_POST['status'],
-        'assigned_staff' => $_POST['assigned_staff'],
-        'notes' => $_POST['notes']
+        'chome_ban' => $_POST['chome_ban'] ?? '',
+        'owner_name' => $_POST['owner_name'] ?? '',
+        'construction_company' => $_POST['construction_company'] ?? '',
+        'water_company' => $_POST['water_company'] ?? '',
+        'pipe_diameter' => $_POST['pipe_diameter'] ?? '',
+        'water_application_date' => $_POST['water_application_date'] ?? null,
+        'payment_date' => $_POST['payment_date'] ?? null,
+        'amount' => $_POST['amount'] ?? null,
+        'neighborhood_association' => $_POST['neighborhood_association'] ?? '',
+        'construction_date' => $_POST['construction_date'] ?? null,
+        'notes' => $_POST['notes'] ?? ''
     ];
     
     if ($db->insert('construction_orders', $data)) {
@@ -64,57 +67,78 @@ include __DIR__ . '/../../includes/header.php';
     <form method="POST">
         <input type="hidden" name="action" value="add">
         
-        <div class="form-group">
-            <label for="customer_name">顧客名 *</label>
-            <input type="text" id="customer_name" name="customer_name" required>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="chome_ban">丁目番</label>
+                <input type="text" id="chome_ban" name="chome_ban" placeholder="例: 1丁目2-3">
+            </div>
+            
+            <div class="form-group">
+                <label for="owner_name">施主</label>
+                <input type="text" id="owner_name" name="owner_name">
+            </div>
         </div>
         
-        <div class="form-group">
-            <label for="address">住所 *</label>
-            <input type="text" id="address" name="address" required>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="construction_company">建築業者</label>
+                <input type="text" id="construction_company" name="construction_company">
+            </div>
+            
+            <div class="form-group">
+                <label for="water_company">水道業者</label>
+                <input type="text" id="water_company" name="water_company">
+            </div>
         </div>
         
-        <div class="form-group">
-            <label for="phone">電話番号</label>
-            <input type="tel" id="phone" name="phone">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="pipe_diameter">口径</label>
+                <select id="pipe_diameter" name="pipe_diameter">
+                    <option value="">選択してください</option>
+                    <option value="13mm">13mm</option>
+                    <option value="20mm">20mm</option>
+                    <option value="25mm">25mm</option>
+                    <option value="30mm">30mm</option>
+                    <option value="40mm">40mm</option>
+                    <option value="50mm">50mm</option>
+                    <option value="その他">その他</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="water_application_date">給水申込書日付</label>
+                <input type="date" id="water_application_date" name="water_application_date">
+            </div>
         </div>
         
-        <div class="form-group">
-            <label for="construction_type">工事種別 *</label>
-            <select id="construction_type" name="construction_type" required>
-                <option value="">選択してください</option>
-                <option value="水道管工事">水道管工事</option>
-                <option value="給水設備工事">給水設備工事</option>
-                <option value="排水設備工事">排水設備工事</option>
-                <option value="修繕工事">修繕工事</option>
-                <option value="その他">その他</option>
-            </select>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="payment_date">入金日</label>
+                <input type="date" id="payment_date" name="payment_date">
+            </div>
+            
+            <div class="form-group">
+                <label for="amount">金額</label>
+                <input type="number" id="amount" name="amount" step="0.01" placeholder="例: 150000">
+            </div>
         </div>
         
-        <div class="form-group">
-            <label for="scheduled_date">工事予定日</label>
-            <input type="date" id="scheduled_date" name="scheduled_date">
-        </div>
-        
-        <div class="form-group">
-            <label for="status">状況 *</label>
-            <select id="status" name="status" required>
-                <option value="受付">受付</option>
-                <option value="見積中">見積中</option>
-                <option value="契約済">契約済</option>
-                <option value="施工中">施工中</option>
-                <option value="完了">完了</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="assigned_staff">担当者</label>
-            <input type="text" id="assigned_staff" name="assigned_staff">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="neighborhood_association">自治会</label>
+                <input type="text" id="neighborhood_association" name="neighborhood_association">
+            </div>
+            
+            <div class="form-group">
+                <label for="construction_date">工事日</label>
+                <input type="date" id="construction_date" name="construction_date">
+            </div>
         </div>
         
         <div class="form-group">
             <label for="notes">備考</label>
-            <textarea id="notes" name="notes"></textarea>
+            <textarea id="notes" name="notes" placeholder="その他の情報や特記事項"></textarea>
         </div>
         
         <button type="submit" class="btn">受付登録</button>
@@ -124,48 +148,58 @@ include __DIR__ . '/../../includes/header.php';
 <div class="table-container" style="margin-top: 2rem;">
     <h2>工事受付一覧</h2>
     <?php if (count($orders) > 0): ?>
-        <table>
-            <thead>
-                <tr>
-                    <th>受付番号</th>
-                    <th>顧客名</th>
-                    <th>住所</th>
-                    <th>工事種別</th>
-                    <th>工事予定日</th>
-                    <th>状況</th>
-                    <th>担当者</th>
-                    <th>操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($orders as $order): ?>
+        <div class="table-responsive">
+            <table>
+                <thead>
                     <tr>
-                        <td><?php echo htmlspecialchars($order['order_number']); ?></td>
-                        <td><?php echo htmlspecialchars($order['customer_name']); ?></td>
-                        <td><?php echo htmlspecialchars($order['address']); ?></td>
-                        <td><?php echo htmlspecialchars($order['construction_type']); ?></td>
-                        <td><?php echo $order['scheduled_date'] ?? '-'; ?></td>
-                        <td>
-                            <?php
-                            $statusClass = 'badge-default';
-                            if ($order['status'] === '受付') $statusClass = 'badge-info';
-                            elseif ($order['status'] === '施工中') $statusClass = 'badge-warning';
-                            elseif ($order['status'] === '完了') $statusClass = 'badge-success';
-                            ?>
-                            <span class="badge <?php echo $statusClass; ?>">
-                                <?php echo htmlspecialchars($order['status']); ?>
-                            </span>
-                        </td>
-                        <td><?php echo htmlspecialchars($order['assigned_staff'] ?? '-'); ?></td>
-                        <td>
-                            <a href="?delete=<?php echo $order['id']; ?>" 
-                               class="btn btn-warning" 
-                               onclick="return confirm('本当に削除しますか？')">削除</a>
-                        </td>
+                        <th>受付番号</th>
+                        <th>丁目番</th>
+                        <th>施主</th>
+                        <th>建築業者</th>
+                        <th>水道業者</th>
+                        <th>口径</th>
+                        <th>給水申込書日付</th>
+                        <th>入金日</th>
+                        <th>金額</th>
+                        <th>自治会</th>
+                        <th>工事日</th>
+                        <th>備考</th>
+                        <th class="action-cell">操作</th>
                     </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php foreach ($orders as $order): ?>
+                        <tr>
+                            <td data-label="受付番号"><?php echo htmlspecialchars($order['order_number']); ?></td>
+                            <td data-label="丁目番"><?php echo htmlspecialchars($order['chome_ban'] ?? '-'); ?></td>
+                            <td data-label="施主"><?php echo htmlspecialchars($order['owner_name'] ?? '-'); ?></td>
+                            <td data-label="建築業者"><?php echo htmlspecialchars($order['construction_company'] ?? '-'); ?></td>
+                            <td data-label="水道業者"><?php echo htmlspecialchars($order['water_company'] ?? '-'); ?></td>
+                            <td data-label="口径"><?php echo htmlspecialchars($order['pipe_diameter'] ?? '-'); ?></td>
+                            <td data-label="給水申込書日付"><?php echo $order['water_application_date'] ?? '-'; ?></td>
+                            <td data-label="入金日"><?php echo $order['payment_date'] ?? '-'; ?></td>
+                            <td data-label="金額">
+                                <?php 
+                                if (isset($order['amount']) && $order['amount'] !== null) {
+                                    echo '¥' . number_format($order['amount']);
+                                } else {
+                                    echo '-';
+                                }
+                                ?>
+                            </td>
+                            <td data-label="自治会"><?php echo htmlspecialchars($order['neighborhood_association'] ?? '-'); ?></td>
+                            <td data-label="工事日"><?php echo $order['construction_date'] ?? '-'; ?></td>
+                            <td data-label="備考" class="notes-cell"><?php echo htmlspecialchars($order['notes'] ?? '-'); ?></td>
+                            <td data-label="操作" class="action-cell">
+                                <a href="?delete=<?php echo $order['id']; ?>" 
+                                   class="btn btn-warning btn-sm" 
+                                   onclick="return confirm('本当に削除しますか？')">削除</a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     <?php else: ?>
         <p>登録されている工事受付はありません。</p>
     <?php endif; ?>
